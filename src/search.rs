@@ -3,10 +3,10 @@ use crate::symbols::{Symbol, Symbols};
 use bstr::Finder;
 use rayon::prelude::*;
 
-impl Symbols {
-    pub fn search_symbols(&self, query_text: &str) -> Vec<String> {
+impl Symbols<'_> {
+    pub fn search_symbols<'a>(&'a self, query_text: &str) -> Symbols<'a> {
         let match_fn = create_query(query_text);
-        self.0.par_iter().cloned().filter(match_fn).map(|sym| sym.symbol).collect()
+        Symbols(self.0.par_iter().cloned().filter(match_fn).collect::<Vec<Symbol>>())  // Distribute search across CPU cores
     }
 }
 
@@ -21,10 +21,9 @@ fn create_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a + S
 
 fn create_words_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a + Send + Sync> {
     let finders: Box<Vec<Finder>> = Box::new(query_text.split(" ").map(Finder::new).collect());  // Want to reuse these structs across many closure invocations.
-    let query_text_copy2 = query_text.to_string();
     let is_symbol_matching = move |symbol: &Symbol| {
         // symbol in query...
-        query_text_copy2.find(&symbol.symbol).is_some() ||
+        query_text.split(" ").find(|w| *w == symbol.symbol).is_some() ||
         // ... or all query words found somewhere in extended description
         finders.iter().all(|f| f.find(&symbol.description).is_some() ||
                                f.find(&symbol.hidden_description).is_some())

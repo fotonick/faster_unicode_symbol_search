@@ -1,0 +1,10 @@
+use std::env;
+use faster_unicode_symbol_search::symbols::{Symbol, Symbols};
+
+const SYMBOLS: &'static [Symbol<'static>] = &%SYMBOLS%;
+fn main() {
+	let query = env::args().nth(1).expect("missing query pattern");
+	let mut symbols = Symbols(Vec::with_capacity(SYMBOLS.len()));
+	symbols.0.extend_from_slice(SYMBOLS);
+    println!("{}", symbols.search_symbols(&query));
+}

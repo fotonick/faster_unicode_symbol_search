@@ -1,52 +1,62 @@
-use std::io::BufRead;
-use rayon::prelude::*;
+use std::fmt;
 
 #[derive(Clone, Debug)]
-pub struct Symbol {
-	pub symbol: String,
-	pub description: String,
-	pub hidden_description: String,
+pub struct Symbol<'a> {
+    pub symbol: &'a str,
+    pub description: &'a str,
+    pub hidden_description: &'a str,
 }
 
 #[derive(Clone, Debug)]
-pub struct Symbols(pub Vec<Symbol>);
+pub struct Symbols<'a>(pub Vec<Symbol<'a>>);
 
 #[derive(Debug)]
 pub enum SymbolError {
 
 }
 
-impl Symbols {
-	pub fn from_file<F>(mut infile: F) -> Result<Symbols, SymbolError>
-		where F: BufRead
-	{
-		let mut buffer = String::new();
-		infile.read_to_string(&mut buffer).expect("Couldn't read file into memory");
-		Symbols::from_string(&buffer)
-	}
-
-	pub fn from_string(buffer: &str) -> Result<Symbols, SymbolError> {
-		let symbols: Result<Vec<Symbol>, SymbolError> = buffer.par_lines().map(|line| parse_symbol(&line)).collect();
-		symbols.map(Symbols)
-	}
+impl fmt::Display for Symbol<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Symbol {{ symbol: &\"{}\", description: &\"{}\", hidden_description: &\"{}\" }}", self.symbol.escape_debug(), self.description.escape_debug(), self.hidden_description.escape_debug())
+    }
 }
 
-fn parse_symbol(line: &str) -> Result<Symbol, SymbolError> {
-	let delim_pos = line.find("| ").expect(&format!("Expected '| ' delimiter in line {}", line));
-	let symbol = &line[..delim_pos];
-	let description = &line.get(delim_pos + 2..).expect(&format!("Expected text after '| ' delimiter in line {}", line));
-	let main_description;
-	let hidden_description;
-	if let Some(delim_pos) = description.find("# ") {
-		main_description = description[..delim_pos].to_owned();
-		hidden_description = description.get(delim_pos + 2..).expect(&format!("Expected text after '# ' delimiter in line {}", line)).to_owned();
-	} else {
-		main_description = description.to_string();
-		hidden_description = "".to_string();
-	}
-	Ok(Symbol {
-		symbol: symbol.to_string(),
-		description: main_description,
-		hidden_description: hidden_description
-	})
+impl fmt::Display for Symbols<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[")?;
+        for sym in self.0.iter().take(1) {
+            write!(f, "{}", sym)?;
+        }
+        for sym in self.0.iter().skip(1) {
+            write!(f, ",\n {}", sym)?;
+        }
+        write!(f, "]")
+    }
+}
+
+impl Symbols<'_> {
+    pub fn from_string(buffer: &str) -> Result<Symbols, SymbolError> {
+        let symbols: Result<Vec<Symbol>, SymbolError> = buffer.lines().map(|line| parse_symbol(&line)).collect();
+        symbols.map(Symbols)
+    }
+}
+
+fn parse_symbol<'a>(line: &'a str) -> Result<Symbol<'a>, SymbolError> {
+    let delim_pos = line.find("| ").expect(&format!("Expected '| ' delimiter in line {}", line));
+    let symbol = &line[..delim_pos].trim();
+    let description = &line.get(delim_pos + 2..).expect(&format!("Expected text after '| ' delimiter in line {}", line));
+    let main_description;
+    let hidden_description;
+    if let Some(delim_pos) = description.find("# ") {
+        main_description = &description[..delim_pos];
+        hidden_description = description.get(delim_pos + 2..).expect(&format!("Expected text after '# ' delimiter in line {}", line));
+    } else {
+        main_description = description;
+        hidden_description = "";
+    }
+    Ok(Symbol {
+        symbol: symbol,
+        description: main_description,
+        hidden_description: hidden_description
+    })
 }

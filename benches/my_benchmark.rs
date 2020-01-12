@@ -23,8 +23,10 @@ pub fn bench_search(c: &mut Criterion) {
 	group.sample_size(20);
 
     let infile = File::open("src/symbols.txt").expect("Could not open file 'symbols.txt'");
-	let infile = BufReader::new(infile);
-    let symbols = Symbols::from_file(infile).expect("couldn't parse symbols");
+	let mut infile = BufReader::new(infile);
+    let mut buffer = String::new();
+    infile.read_to_string(&mut buffer).expect("Couldn't read file into memory");
+    let symbols = Symbols::from_string(&buffer).expect("couldn't parse symbols");
 
     for input in ["rarr", "sigma"].iter() {
 	    group.bench_with_input(BenchmarkId::new("Symbols::search_symbols ", input), input, |b, s| b.iter(|| symbols.search_symbols(s)));
