@@ -1,14 +1,16 @@
+
 use crate::symbols::{Symbol, Symbols};
 use bstr::Finder;
+use rayon::prelude::*;
 
 impl Symbols {
-    pub fn search_symbols<'a>(&'a self, query_text: &'a str) -> impl Iterator<Item=String> + 'a {
+    pub fn search_symbols(&self, query_text: &str) -> Vec<String> {
         let match_fn = create_query(query_text);
-        Box::new(self.0.iter().cloned().filter(match_fn).map(|sym| sym.symbol))
+        self.0.par_iter().cloned().filter(match_fn).map(|sym| sym.symbol).collect()
     }
 }
 
-fn create_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a> {
+fn create_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a + Send + Sync> {
     let letters: Vec<&str> = query_text.split(" ").filter(|w| w.len() == 1).collect();
     if letters.len() == 1 {
         create_single_letter_query(letters[0], query_text)
@@ -17,7 +19,7 @@ fn create_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a> {
     }
 }
 
-fn create_words_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a> {
+fn create_words_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a + Send + Sync> {
     let finders: Box<Vec<Finder>> = Box::new(query_text.split(" ").map(Finder::new).collect());  // Want to reuse these structs across many closure invocations.
     let query_text_copy2 = query_text.to_string();
     let is_symbol_matching = move |symbol: &Symbol| {
@@ -30,7 +32,7 @@ fn create_words_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 
     Box::new(is_symbol_matching)
 }
 
-fn create_single_letter_query(letter: &str, query_text: &str) -> Box<dyn Fn(&Symbol) -> bool> {
+fn create_single_letter_query(letter: &str, query_text: &str) -> Box<dyn Fn(&Symbol) -> bool + Send + Sync> {
     let letter = letter.to_owned();
     let query = query_text.to_owned();
     let is_symbol_matching = move |symbol: &Symbol| {

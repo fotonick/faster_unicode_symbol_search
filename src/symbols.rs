@@ -1,4 +1,5 @@
 use std::io::BufRead;
+use rayon::prelude::*;
 
 #[derive(Clone, Debug)]
 pub struct Symbol {
@@ -16,14 +17,17 @@ pub enum SymbolError {
 }
 
 impl Symbols {
-	pub fn from_file<F>(infile: F) -> Result<Symbols, SymbolError>
+	pub fn from_file<F>(mut infile: F) -> Result<Symbols, SymbolError>
 		where F: BufRead
 	{
-		let mut symbols = Vec::new();
-		for line in infile.lines() {
-			symbols.push(parse_symbol(&line.expect("Couldn't parse line"))?);
-		}
-		Ok(Symbols(symbols))
+		let mut buffer = String::new();
+		infile.read_to_string(&mut buffer).expect("Couldn't read file into memory");
+		Symbols::from_string(&buffer)
+	}
+
+	pub fn from_string(buffer: &str) -> Result<Symbols, SymbolError> {
+		let symbols: Result<Vec<Symbol>, SymbolError> = buffer.par_lines().map(|line| parse_symbol(&line)).collect();
+		symbols.map(Symbols)
 	}
 }
 
