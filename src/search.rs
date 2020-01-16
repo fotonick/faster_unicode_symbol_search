@@ -1,12 +1,11 @@
-
 use crate::symbols::{Symbol, Symbols};
 use bstr::Finder;
 use rayon::prelude::*;
 
 impl Symbols<'_> {
-    pub fn search_symbols<'a>(&'a self, query_text: &str) -> Symbols<'a> {
+    pub fn search_symbols<'a>(&'a self, query_text: &str) -> Vec<Symbol> {
         let match_fn = create_query(query_text);
-        Symbols(self.0.par_iter().cloned().filter(match_fn).collect::<Vec<Symbol>>())  // Distribute search across CPU cores
+        self.0.par_iter().cloned().filter(match_fn).collect::<Vec<Symbol>>()  // Distribute search across CPU cores
     }
 }
 

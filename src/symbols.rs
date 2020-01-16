@@ -8,7 +8,7 @@ pub struct Symbol<'a> {
 }
 
 #[derive(Clone, Debug)]
-pub struct Symbols<'a>(pub Vec<Symbol<'a>>);
+pub struct Symbols<'a>(pub &'a[Symbol<'a>]);
 
 #[derive(Debug)]
 pub enum SymbolError {
@@ -34,11 +34,8 @@ impl fmt::Display for Symbols<'_> {
     }
 }
 
-impl Symbols<'_> {
-    pub fn from_string(buffer: &str) -> Result<Symbols, SymbolError> {
-        let symbols: Result<Vec<Symbol>, SymbolError> = buffer.lines().map(|line| parse_symbol(&line)).collect();
-        symbols.map(Symbols)
-    }
+pub fn from_string(buffer: &str) -> Result<Vec<Symbol>, SymbolError> {
+    buffer.lines().map(|line| parse_symbol(&line)).collect()
 }
 
 fn parse_symbol<'a>(line: &'a str) -> Result<Symbol<'a>, SymbolError> {

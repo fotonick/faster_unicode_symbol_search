@@ -9,6 +9,7 @@ build = "src/build.rs"
 
 [dependencies]
 bstr = "0.2"
+itertools = "0.8"
 rayon = "1.3"
 
 [dev-dependencies]

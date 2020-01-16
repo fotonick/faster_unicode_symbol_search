@@ -1,10 +1,15 @@
 use std::env;
+use std::process::exit;
+use itertools::Itertools;
 use faster_unicode_symbol_search::symbols::{Symbol, Symbols};
 
 const SYMBOLS: &'static [Symbol<'static>] = &%SYMBOLS%;
 fn main() {
-	let query = env::args().nth(1).expect("missing query pattern");
-	let mut symbols = Symbols(Vec::with_capacity(SYMBOLS.len()));
-	symbols.0.extend_from_slice(SYMBOLS);
-    println!("{}", symbols.search_symbols(&query));
+	let query = env::args().skip(1).join(" ");
+	if query.len() < 1 || query == "-h" || query == "--help" {
+		println!("Usage: {} [query]", env::args().nth(0).unwrap());
+		exit(2);
+	}
+	let symbols = Symbols(SYMBOLS);
+    println!("{}", Symbols(&symbols.search_symbols(&query)));
 }
