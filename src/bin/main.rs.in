@@ -1,11 +1,17 @@
 #![forbid(unsafe_code)]
 
 use std::env;
+use std::io::{BufWriter, Write};
 use std::process::exit;
 use itertools::Itertools;
 use faster_unicode_symbol_search::symbols::{Symbol, Symbols};
 
 const SYMBOLS: &[Symbol<'static>] = &%SYMBOLS%;
+
+fn write_symbol<W>(w: &mut W, sym: &Symbol) where W: Write {
+    write!(w, "{{\"arg\": \"{}\", \"subtitle\": \"{}\", \"title\": \"{}\"}}", sym.symbol, sym.description, sym.symbol).unwrap();
+}
+
 fn main() {
     let query = env::args().skip(1).join(" ");
     if query.is_empty() || query == "-h" || query == "--help" {
@@ -13,5 +19,22 @@ fn main() {
         exit(2);
     }
     let symbols = Symbols(SYMBOLS);
-    println!("{}", Symbols(&symbols.search_symbols(&query)));
+
+    // Do the work
+    let results: Vec<_> = symbols.search_symbols(&query);
+
+    // Print as Alfred v3 JSON format
+    let stdout = std::io::stdout();
+    let handle = stdout.lock();
+    let mut writer = BufWriter::new(handle);
+    writer.write_all(b"{\"items\":[").unwrap();
+    for symbol in results.iter().take(1) {
+        write_symbol(&mut writer, &symbol);
+    }
+    for symbol in results.iter().skip(1) {
+        writer.write_all(b", ").unwrap();
+        write_symbol(&mut writer, &symbol);
+    }
+    writer.write_all(b"]}\n").unwrap();
+    writer.flush().unwrap();
 }

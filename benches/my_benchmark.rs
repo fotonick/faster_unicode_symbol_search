@@ -31,7 +31,7 @@ pub fn bench_search(c: &mut Criterion) {
     let symbols_vec = from_string(&buffer).expect("couldn't parse symbols");
     let symbols = Symbols(&symbols_vec);
 
-    for input in ["rarr", "sigma", "µ"].iter() {
+    for input in ["rarr", "µ", "capital delta"].iter() {
 	    group.bench_with_input(BenchmarkId::new("Symbols::search_symbols", input), input, |b, s| b.iter(|| symbols.search_symbols(black_box(s))));
     }
 
@@ -45,7 +45,7 @@ pub fn bench_program(c: &mut Criterion) {
 	Command::new("cargo").arg("build").arg("--release").spawn().unwrap().wait().unwrap();
 	let mut command = Command::new("target/release/fuss");
 
-    for input in ["rarr", "sigma", "µ"].iter() {
+    for input in ["rarr", "µ", "capital delta"].iter() {
 	    group.bench_with_input(BenchmarkId::new("target/release/fuss", input), input, |b, input| b.iter(|| command.arg(black_box(input)).output().unwrap()));
     }
 
