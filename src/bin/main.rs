@@ -6,8 +6,12 @@ use std::process::exit;
 use itertools::Itertools;
 use faster_unicode_symbol_search::symbols::{Symbol, Symbols};
 
-const SYMBOLS: &[Symbol<'static>] = &%SYMBOLS%;
+use bincode;
 
+const PARSED_SYMBOLS_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/parsed_symbols.bin"));
+
+// Format for Alfred script filter display (Afred v3 JSON format)
+// Ref: https://www.alfredapp.com/help/workflows/inputs/script-filter/json/
 fn write_symbol<W>(w: &mut W, sym: &Symbol) where W: Write {
     write!(w, "{{\"arg\": \"{}\", \"subtitle\": \"{}\", \"title\": \"{}\"}}", sym.symbol, sym.description, sym.symbol).unwrap();
 }
@@ -18,12 +22,13 @@ fn main() {
         println!("Usage: {} [query]", env::args().nth(0).unwrap());
         exit(2);
     }
-    let symbols = Symbols(SYMBOLS);
+    // let symbols = Symbols(SYMBOLS);
+    let symbols: Symbols = bincode::deserialize(&PARSED_SYMBOLS_BYTES).unwrap();
 
     // Do the work
     let results: Vec<_> = symbols.search_symbols(&query);
 
-    // Print as Alfred v3 JSON format
+    // Print
     let stdout = std::io::stdout();
     let handle = stdout.lock();
     let mut writer = BufWriter::new(handle);

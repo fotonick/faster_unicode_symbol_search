@@ -29,7 +29,7 @@ pub fn bench_search(c: &mut Criterion) {
     let mut buffer = String::new();
     infile.read_to_string(&mut buffer).expect("Couldn't read file into memory");
     let symbols_vec = from_string(&buffer).expect("couldn't parse symbols");
-    let symbols = Symbols(&symbols_vec);
+    let symbols = Symbols(symbols_vec);
 
     for input in ["rarr", "µ", "capital delta"].iter() {
 	    group.bench_with_input(BenchmarkId::new("Symbols::search_symbols", input), input, |b, s| b.iter(|| symbols.search_symbols(black_box(s))));

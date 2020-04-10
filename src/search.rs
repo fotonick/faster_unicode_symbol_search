@@ -2,12 +2,18 @@ use crate::symbols::{Symbol, Symbols};
 use bstr::Finder;
 use rayon::prelude::*;
 
-impl Symbols<'_> {
-    pub fn search_symbols<'a>(&'a self, query_text: &str) -> Vec<Symbol> {
+impl Symbols {
+    pub fn search_symbols(&self, query_text: &str) -> Vec<Symbol> {
+        // Distribute search across CPU cores with Rayon's par_iter().
         let match_fn = create_query(query_text);
-        self.0.par_iter().cloned().filter(match_fn).collect::<Vec<Symbol>>()  // Distribute search across CPU cores
+        self.0.par_iter().cloned().filter(match_fn).collect::<Vec<Symbol>>()
     }
 }
+
+//
+// The search heuristics below were ported fairly directly from the original
+// Github repo bevesce/unicode_symbols_search.
+//
 
 fn create_query<'a>(query_text: &'a str) -> Box<dyn Fn(&Symbol) -> bool + 'a + Send + Sync> {
     let letters: Vec<&str> = query_text.split(" ").filter(|w| w.len() == 1).collect();

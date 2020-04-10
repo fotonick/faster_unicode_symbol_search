@@ -1,27 +1,29 @@
 use std::fmt;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug)]
-pub struct Symbol<'a> {
-    pub symbol: &'a str,
-    pub description: &'a str,
-    pub hidden_description: &'a str,
+// Use owned strings instead of references to original string for serializability
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Symbol {
+    pub symbol: String,
+    pub description: String,
+    pub hidden_description: String,
 }
 
-#[derive(Clone, Debug)]
-pub struct Symbols<'a>(pub &'a[Symbol<'a>]);
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Symbols(pub Vec<Symbol>);
 
 #[derive(Debug)]
 pub enum SymbolError {
 
 }
 
-impl fmt::Display for Symbol<'_> {
+impl fmt::Display for Symbol {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Symbol {{ symbol: &\"{}\", description: &\"{}\", hidden_description: &\"{}\" }}", self.symbol.escape_debug(), self.description.escape_debug(), self.hidden_description.escape_debug())
     }
 }
 
-impl fmt::Display for Symbols<'_> {
+impl fmt::Display for Symbols {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[")?;
         for sym in self.0.iter().take(1) {
@@ -38,7 +40,7 @@ pub fn from_string(buffer: &str) -> Result<Vec<Symbol>, SymbolError> {
     buffer.lines().map(|line| parse_symbol(&line)).collect()
 }
 
-fn parse_symbol<'a>(line: &'a str) -> Result<Symbol<'a>, SymbolError> {
+fn parse_symbol(line: &str) -> Result<Symbol, SymbolError> {
     let delim_pos = line.find("| ").expect(&format!("Expected '| ' delimiter in line {}", line));
     let symbol = &line[..delim_pos].trim();
     let description = &line.get(delim_pos + 2..).expect(&format!("Expected text after '| ' delimiter in line {}", line));
@@ -52,8 +54,8 @@ fn parse_symbol<'a>(line: &'a str) -> Result<Symbol<'a>, SymbolError> {
         hidden_description = "";
     }
     Ok(Symbol {
-        symbol: symbol,
-        description: main_description,
-        hidden_description: hidden_description
+        symbol: symbol.to_string(),
+        description: main_description.to_string(),
+        hidden_description: hidden_description.to_string()
     })
 }
