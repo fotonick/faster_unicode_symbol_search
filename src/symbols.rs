@@ -42,15 +42,15 @@ pub fn from_string(buffer: &str) -> Result<Vec<Symbol>, SymbolError> {
 
 fn parse_symbol(line: &str) -> Result<Symbol, SymbolError> {
     let delim_pos = line.find("| ").expect(&format!("Expected '| ' delimiter in line {}", line));
-    let symbol = &line[..delim_pos].trim();
+    let symbol = &line[1..delim_pos];
     let description = &line.get(delim_pos + 2..).expect(&format!("Expected text after '| ' delimiter in line {}", line));
     let main_description;
     let hidden_description;
     if let Some(delim_pos) = description.find("# ") {
-        main_description = &description[..delim_pos];
+        main_description = description[..delim_pos].trim();
         hidden_description = description.get(delim_pos + 2..).expect(&format!("Expected text after '# ' delimiter in line {}", line));
     } else {
-        main_description = description;
+        main_description = description.trim();
         hidden_description = "";
     }
     Ok(Symbol {
