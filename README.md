@@ -70,4 +70,9 @@ To bump the version number of the Alfred workflow, edit ``info.plist`` near the 
 License
 -------
 
-This software is MIT licensed.
+This software is released under the MIT license.
+
+Contribution
+------------
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion into this project shall be licensed as MIT, without any additional terms or conditions.
