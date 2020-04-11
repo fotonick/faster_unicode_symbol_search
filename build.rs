@@ -13,10 +13,13 @@ const MAIN_DEPENDENCIES: &[&'static str] = &[SYMBOLS_DATABASE, &"src/symbols.rs"
 
 fn build() {
     // Parse symbols
-    let infile = File::open(SYMBOLS_DATABASE).expect(&format!("Could not open file '{}'", SYMBOLS_DATABASE));
+    let infile =
+        File::open(SYMBOLS_DATABASE).expect(&format!("Could not open file '{}'", SYMBOLS_DATABASE));
     let mut infile = BufReader::new(infile);
     let mut buffer = String::new();
-    infile.read_to_string(&mut buffer).expect("Couldn't read file into memory");
+    infile
+        .read_to_string(&mut buffer)
+        .expect("Couldn't read file into memory");
     let symbols_vec = from_string(&buffer).expect("Could not parse file");
     let symbols = Symbols(symbols_vec);
 

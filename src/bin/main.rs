@@ -1,10 +1,10 @@
 #![forbid(unsafe_code)]
 
+use faster_unicode_symbol_search::symbols::{Symbol, Symbols};
+use itertools::Itertools;
 use std::env;
 use std::io::{BufWriter, Write};
 use std::process::exit;
-use itertools::Itertools;
-use faster_unicode_symbol_search::symbols::{Symbol, Symbols};
 
 use bincode;
 
@@ -12,8 +12,16 @@ const PARSED_SYMBOLS_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/pa
 
 // Format for Alfred script filter display (Afred v3 JSON format)
 // Ref: https://www.alfredapp.com/help/workflows/inputs/script-filter/json/
-fn write_symbol<W>(w: &mut W, sym: &Symbol) where W: Write {
-    write!(w, "{{\"arg\": \"{}\", \"subtitle\": \"{}\", \"title\": \"{}\"}}", sym.symbol, sym.description, sym.symbol).unwrap();
+fn write_symbol<W>(w: &mut W, sym: &Symbol)
+where
+    W: Write,
+{
+    write!(
+        w,
+        "{{\"arg\": \"{}\", \"subtitle\": \"{}\", \"title\": \"{}\"}}",
+        sym.symbol, sym.description, sym.symbol
+    )
+    .unwrap();
 }
 
 fn main() {
