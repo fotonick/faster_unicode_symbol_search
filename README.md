@@ -7,7 +7,7 @@ Fuss is a reimplementation of the highly useful [Unicode Symbols Search](https:/
 
 For example, let us write that the thickness of paper is generally 70–100 µm.
 
-![Animation of fuss search for micro](fuss_micro.gif)
+![Animation of fuss search for micro](doc/fuss_micro.gif)
 
 Installation
 ------------
@@ -22,10 +22,10 @@ When you invoke Alfred with your assigned hotkey, generally ⌥␣ (option-space
 Examples
 --------
 
-![Image of fuss search for capital delta](fuss_capital_delta.png)
-![Image of fuss search for lightning](fuss_lightning.png)
-![Image of fuss search for plus or minus](fuss_plusm.png)
-![Image of fuss search for speed](fuss_speed.png)
+![Image of fuss search for capital delta](doc/fuss_capital_delta.png)
+![Image of fuss search for lightning](doc/fuss_lightning.png)
+![Image of fuss search for plus or minus](doc/fuss_plusm.png)
+![Image of fuss search for speed](doc/fuss_speed.png)
 
 Performance
 -----------
