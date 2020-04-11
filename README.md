@@ -12,7 +12,7 @@ For example, let us write that the thickness of paper is generally 70–100 µ
 Installation
 ------------
 
-Fuss is a workflow for [Alfred 4](https://www.alfredapp.com/), a powerful and extensible launcher for macOS. Install Alfred, then open the [latest fuss workflow release](<https://github.com/fotonick/faster_unicode_symbol_search/releases/latest/download/Faster Unicode Symbol Search.alfredworkflow>).
+Fuss is a workflow for [Alfred 4](https://www.alfredapp.com/), a powerful and extensible launcher for macOS. Install Alfred, then open the [latest fuss workflow release](<https://github.com/fotonick/faster_unicode_symbol_search/releases/download/v0.1/Faster.Unicode.Symbol.Search.alfredworkflow>).
 
 Usage
 -----
