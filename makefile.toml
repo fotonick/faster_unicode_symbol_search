@@ -1,0 +1,19 @@
+[tasks.build]
+args = ["build", "--release"]
+
+[tasks.package]
+clear = true  # clear original meaning of package command
+description = "Package up an Alfred workflow ready for installation"
+script = [
+'''
+TEMP_DIR=$(mktemp -d)
+cp target/release/fuss "${TEMP_DIR}"
+cp icon.png "${TEMP_DIR}"
+cp info.plist "${TEMP_DIR}"
+pushd "${TEMP_DIR}"
+zip "${CARGO_MAKE_WORKING_DIRECTORY}/Faster Unicode Symbol Search.alfredworkflow" *
+popd
+rm -rf "${TEMP_DIR}"
+'''
+]
+dependencies = ["build"]
