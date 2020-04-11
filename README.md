@@ -60,6 +60,13 @@ cargo make package
 open "Faster Unicode Symbol Search.alfredworkflow"
 ```
 
+To bump the version number of the Alfred workflow, edit ``info.plist`` near the bottom:
+
+```
+    <key>version</key>
+    <string>0.1</string>
+```
+
 License
 -------
 
