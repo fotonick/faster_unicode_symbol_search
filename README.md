@@ -50,8 +50,10 @@ Building from source
 Fuss is written in the Rust programming language. The rust toolchain can be installed via ``brew install rustup; rustup-init`` if you use Homebrew, or else from the [rustup website](https://rustup.rs/) directly. Then:
 
 ```
-# just run one time
+# one-time setup for universal builds
 cargo install cargo-make
+rustup target install x86_64-apple-darwin
+rustup target install aarch64-apple-darwin
 
 # build and package
 cargo make package
