@@ -1,30 +1,20 @@
-[tasks.build_x86_64]
-command = "cargo"
-args = ["build", "--release", "--target", "x86_64-apple-darwin"]
-
-[tasks.build_aarch64]
+[tasks.build]
 command = "cargo"
 args = ["build", "--release", "--target", "aarch64-apple-darwin"]
 
-[tasks.build]
-description = "make universal (\"fat\") macOS binary by stapling x86_64 and aarch64 builds together"
-command = "/usr/bin/lipo"
-args = ["-create", "-output", "target/fuss", "target/x86_64-apple-darwin/release/fuss", "target/aarch64-apple-darwin/release/fuss"]
-dependencies = ["build_x86_64", "build_aarch64"]
-
 [tasks.package]
-clear = true  # clear original meaning of package command
+clear = true # clear original meaning of package command
 description = "Package up an Alfred workflow ready for installation"
 script = [
-'''
+    '''
 TEMP_DIR=$(mktemp -d)
-cp target/fuss "${TEMP_DIR}"
+cp target/aarch64-apple-darwin/release/fuss "${TEMP_DIR}"
 cp doc/icon.png "${TEMP_DIR}"
 cp info.plist "${TEMP_DIR}"
 pushd "${TEMP_DIR}"
 zip "${CARGO_MAKE_WORKING_DIRECTORY}/Faster Unicode Symbol Search.alfredworkflow" *
 popd
 rm -rf "${TEMP_DIR}"
-'''
+''',
 ]
 dependencies = ["build"]
