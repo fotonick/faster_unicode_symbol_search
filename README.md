@@ -12,7 +12,15 @@ For example, let us write that the thickness of paper is generally 70–100 µ
 Installation
 ------------
 
-Fuss is a workflow for [Alfred 4](https://www.alfredapp.com/), a powerful and extensible launcher for macOS. Install Alfred, then open the [latest fuss workflow release](<https://github.com/fotonick/faster_unicode_symbol_search/releases/latest>).
+Fuss is a workflow for [Alfred 5](https://www.alfredapp.com/), a powerful and extensible launcher for macOS. Install Alfred, buy the Powerpack (required to import workflows), then open the [latest fuss workflow release](<https://github.com/fotonick/faster_unicode_symbol_search/releases/latest>).
+
+Because I have not gone through Apple's (non-free) developer signing process, macOS will forbid you running the `fuss` executable. You can whitelist it by:
+
+1. In the Alfred Workflow list, right-click on the Faster Unicode Symbol Search and select Open in Finder.
+2. In the Finder window that pops up, right-click on the `fuss` executable and select Open. This will give you the same scary popup as before, but now you have an Open Anyway option.
+3. Select Open Anyway and authenticate when prompted.
+
+If you don't trust my release, examine the source code of this repository and build it yourself with the instructions further below. Yay, open source.
 
 Usage
 -----
@@ -50,15 +58,13 @@ Building from source
 Fuss is written in the Rust programming language. The rust toolchain can be installed via ``brew install rustup; rustup-init`` if you use Homebrew, or else from the [rustup website](https://rustup.rs/) directly. Then:
 
 ```
-# one-time setup for universal builds
+# one-time setup
 cargo install cargo-make
-rustup target install x86_64-apple-darwin
-rustup target install aarch64-apple-darwin
 
 # build and package
 cargo make package
 
-# install
+# install / import into Alfred
 open "Faster Unicode Symbol Search.alfredworkflow"
 ```
 
